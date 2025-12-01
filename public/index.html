@@ -1,90 +1,435 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Student App</title>
+  <meta charset="UTF-8" />
+  <title>UniversityDB – Student & Course Demo</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    input { margin: 5px; padding: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #eee; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    input {
+      padding: 4px 6px;
+      margin-bottom: 4px;
+      width: 220px;
+    }
+
+    button {
+      margin-top: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    hr {
+      margin: 25px 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      padding: 12px 16px;
+      border-radius: 4px;
+      max-width: 320px;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    .status {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #007700;
+    }
+
+    .status.error {
+      color: #bb0000;
+    }
   </style>
 </head>
 <body>
+  <h1>University Database Demo</h1>
+  <p class="small">
+    Backend: Node + Express + MySQL, connected to <strong>universitydb</strong>.
+  </p>
 
-  <h2>Add New Student</h2>
+  <!-- =======================
+       SECTION 1 – STUDENT CRUD
+       ======================= -->
+  <div class="section">
+    <h2>Students</h2>
 
-  <form id="userForm">
-    <input type="number" id="studentNum" placeholder="Student Number" required><br>
-    <input type="text" id="fName" placeholder="First Name" required><br>
-    <input type="text" id="lName" placeholder="Last Name" required><br>
-    <input type="email" id="studentEmail" placeholder="Email"><br>
-    <input type="text" id="studentMainPhone" placeholder="Phone"><br>
+    <div class="row">
+      <!-- Add student -->
+      <div class="card">
+        <h3>Add New Student</h3>
+        <label for="studentNum">Student Number</label>
+        <input id="studentNum" type="number" />
 
-    <button type="submit">Add User</button>
-  </form>
+        <label for="fName">First Name</label>
+        <input id="fName" type="text" />
 
-  <hr>
+        <label for="lName">Last Name</label>
+        <input id="lName" type="text" />
 
-  <button onclick="loadUsers()">View Users</button>
+        <label for="studentEmail">Email</label>
+        <input id="studentEmail" type="email" />
 
-  <table id="usersTable">
-    <thead>
-      <tr>
-        <th>Student #</th>
-        <th>First</th>
-        <th>Last</th>
-        <th>Email</th>
-        <th>Phone</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+        <label for="studentMainPhone">Phone</label>
+        <input id="studentMainPhone" type="text" />
+
+        <button id="btnAddStudent">Add Student</button>
+        <div id="addStatus" class="status"></div>
+      </div>
+
+      <!-- Update student -->
+      <div class="card">
+        <h3>Update Student Contact</h3>
+        <p class="small">Updates email + phone based on student number.</p>
+
+        <label for="updStudentNum">Student Number</label>
+        <input id="updStudentNum" type="number" />
+
+        <label for="updEmail">New Email</label>
+        <input id="updEmail" type="email" />
+
+        <label for="updPhone">New Phone</label>
+        <input id="updPhone" type="text" />
+
+        <button id="btnUpdateStudent">Update Student</button>
+        <div id="updateStatus" class="status"></div>
+      </div>
+
+      <!-- Delete student -->
+      <div class="card">
+        <h3>Delete Student</h3>
+        <p class="small">Deletes the student row (careful!).</p>
+
+        <label for="delStudentNum">Student Number</label>
+        <input id="delStudentNum" type="number" />
+
+        <button id="btnDeleteStudent">Delete Student</button>
+        <div id="deleteStatus" class="status"></div>
+      </div>
+    </div>
+
+    <hr />
+
+    <button id="btnViewStudents">View All Students</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Student #</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTableBody">
+        <!-- filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- =======================
+       SECTION 2 – PROFESSOR COURSES
+       ======================= -->
+  <div class="section">
+    <h2>Professor Courses (JOIN)</h2>
+    <div class="card">
+      <p class="small">
+        Shows all courses taught by a given professor using
+        <code>teaches</code> + <code>course</code>.
+      </p>
+      <label for="professorIDInput">Professor ID</label>
+      <input id="professorIDInput" type="number" />
+      <button id="btnProfessorCourses">View Professor Courses</button>
+      <div id="profCourseStatus" class="status"></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Course ID</th>
+          <th>Course Name</th>
+          <th>TA Name</th>
+          <th>Dept Email</th>
+        </tr>
+      </thead>
+      <tbody id="professorCoursesBody">
+        <!-- filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- =======================
+       SECTION 3 – COURSE ENROLLMENT REPORT
+       ======================= -->
+  <div class="section">
+    <h2>Course Enrollment Report (JOIN + GROUP BY)</h2>
+    <div class="card">
+      <p class="small">
+        Uses a JOIN between <code>course</code> and <code>attends</code> plus
+        <code>GROUP BY</code> to count students per course.
+      </p>
+      <button id="btnCourseEnrollment">Generate Report</button>
+      <div id="enrollmentStatus" class="status"></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Course ID</th>
+          <th>Course Name</th>
+          <th># Students</th>
+        </tr>
+      </thead>
+      <tbody id="courseEnrollmentBody">
+        <!-- filled by JS -->
+      </tbody>
+    </table>
+  </div>
 
   <script>
-    document.getElementById('userForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Base URL (same origin as server)
+    const BASE = '';
 
-      const student = {
-        studentNum: document.getElementById('studentNum').value,
-        fName: document.getElementById('fName').value,
-        lName: document.getElementById('lName').value,
-        studentEmail: document.getElementById('studentEmail').value,
-        studentMainPhone: document.getElementById('studentMainPhone').value
-      };
+    // ---------- Helpers ----------
+    function setStatus(id, message, isError = false) {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.classList.toggle('error', isError);
+    }
 
-      const res = await fetch('/add_user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(student)
-      });
+    // ---------- Students: Add ----------
+    document.getElementById('btnAddStudent').addEventListener('click', async () => {
+      const studentNum = document.getElementById('studentNum').value.trim();
+      const fName = document.getElementById('fName').value.trim();
+      const lName = document.getElementById('lName').value.trim();
+      const studentEmail = document.getElementById('studentEmail').value.trim();
+      const studentMainPhone = document.getElementById('studentMainPhone').value.trim();
 
-      const data = await res.json();
-      alert(data.message);
-      e.target.reset();
+      if (!studentNum || !fName || !lName) {
+        setStatus('addStatus', 'Student number, first, and last name are required.', true);
+        return;
+      }
+
+      try {
+        const res = await fetch(BASE + '/add_user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentNum, fName, lName, studentEmail, studentMainPhone })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error adding student');
+
+        setStatus('addStatus', data.message || 'Student added.');
+        // optionally refresh the student list
+        loadStudents();
+      } catch (err) {
+        console.error(err);
+        setStatus('addStatus', err.message, true);
+      }
     });
 
-    async function loadUsers() {
-      const res = await fetch('/get_users');
-      const users = await res.json();
+    // ---------- Students: View ----------
+    async function loadStudents() {
+      try {
+        const res = await fetch(BASE + '/get_users');
+        const data = await res.json();
+        const tbody = document.getElementById('studentsTableBody');
+        tbody.innerHTML = '';
 
-      const tbody = document.querySelector('#usersTable tbody');
-      tbody.innerHTML = "";
-
-      users.forEach(u => {
-        const row = `
-          <tr>
-            <td>${u.studentNum}</td>
-            <td>${u.fName}</td>
-            <td>${u.lName}</td>
-            <td>${u.studentEmail || ''}</td>
-            <td>${u.studentMainPhone || ''}</td>
-          </tr>
-        `;
-        tbody.innerHTML += row;
-      });
+        data.forEach((s) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${s.studentNum}</td>
+            <td>${s.fName || ''}</td>
+            <td>${s.lName || ''}</td>
+            <td>${s.studentEmail || ''}</td>
+            <td>${s.studentMainPhone || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Error loading students: ' + err.message);
+      }
     }
-  </script>
 
+    document.getElementById('btnViewStudents').addEventListener('click', loadStudents);
+
+    // ---------- Students: Update ----------
+    document
+      .getElementById('btnUpdateStudent')
+      .addEventListener('click', async () => {
+        const studentNum = document.getElementById('updStudentNum').value.trim();
+        const studentEmail = document.getElementById('updEmail').value.trim();
+        const studentMainPhone = document.getElementById('updPhone').value.trim();
+
+        if (!studentNum) {
+          setStatus('updateStatus', 'Student number is required.', true);
+          return;
+        }
+
+        try {
+          const res = await fetch(BASE + '/students/' + encodeURIComponent(studentNum), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ studentEmail, studentMainPhone })
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error updating student');
+
+          setStatus('updateStatus', data.message || 'Student updated.');
+          loadStudents();
+        } catch (err) {
+          console.error(err);
+          setStatus('updateStatus', err.message, true);
+        }
+      });
+
+    // ---------- Students: Delete ----------
+    document
+      .getElementById('btnDeleteStudent')
+      .addEventListener('click', async () => {
+        const studentNum = document.getElementById('delStudentNum').value.trim();
+        if (!studentNum) {
+          setStatus('deleteStatus', 'Student number is required.', true);
+          return;
+        }
+
+        if (!confirm('Are you sure you want to delete student ' + studentNum + '?')) {
+          return;
+        }
+
+        try {
+          const res = await fetch(BASE + '/students/' + encodeURIComponent(studentNum), {
+            method: 'DELETE'
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error deleting student');
+
+          setStatus('deleteStatus', data.message || 'Student deleted.');
+          loadStudents();
+        } catch (err) {
+          console.error(err);
+          setStatus('deleteStatus', err.message, true);
+        }
+      });
+
+    // ---------- Professor Courses (JOIN) ----------
+    document
+      .getElementById('btnProfessorCourses')
+      .addEventListener('click', async () => {
+        const professorID = document.getElementById('professorIDInput').value.trim();
+        if (!professorID) {
+          setStatus('profCourseStatus', 'Professor ID is required.', true);
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            BASE + '/professors/' + encodeURIComponent(professorID) + '/courses'
+          );
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error fetching courses');
+
+          const tbody = document.getElementById('professorCoursesBody');
+          tbody.innerHTML = '';
+
+          data.forEach((c) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${c.courseID}</td>
+              <td>${c.courseName || ''}</td>
+              <td>${c.taName || ''}</td>
+              <td>${c.deptEmail || ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          setStatus('profCourseStatus', `Found ${data.length} course(s).`);
+        } catch (err) {
+          console.error(err);
+          setStatus('profCourseStatus', err.message, true);
+        }
+      });
+
+    // ---------- Course Enrollment Report (JOIN + GROUP BY) ----------
+    document
+      .getElementById('btnCourseEnrollment')
+      .addEventListener('click', async () => {
+        try {
+          const res = await fetch(BASE + '/reports/course-enrollment');
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error fetching report');
+
+          const tbody = document.getElementById('courseEnrollmentBody');
+          tbody.innerHTML = '';
+
+          data.forEach((row) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.courseID}</td>
+              <td>${row.courseName || ''}</td>
+              <td>${row.numStudents}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          setStatus('enrollmentStatus', 'Report loaded: ' + data.length + ' course(s).');
+        } catch (err) {
+          console.error(err);
+          setStatus('enrollmentStatus', err.message, true);
+        }
+      });
+
+    // optional: load students on initial page load
+    loadStudents();
+  </script>
 </body>
 </html>
