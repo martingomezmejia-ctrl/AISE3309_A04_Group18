@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student App</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin: 5px; padding: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+
+  <h2>Add New Student</h2>
+
+  <form id="userForm">
+    <input type="number" id="studentNum" placeholder="Student Number" required><br>
+    <input type="text" id="fName" placeholder="First Name" required><br>
+    <input type="text" id="lName" placeholder="Last Name" required><br>
+    <input type="email" id="studentEmail" placeholder="Email"><br>
+    <input type="text" id="studentMainPhone" placeholder="Phone"><br>
+
+    <button type="submit">Add User</button>
+  </form>
+
+  <hr>
+
+  <button onclick="loadUsers()">View Users</button>
+
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Student #</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Email</th>
+        <th>Phone</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const student = {
+        studentNum: document.getElementById('studentNum').value,
+        fName: document.getElementById('fName').value,
+        lName: document.getElementById('lName').value,
+        studentEmail: document.getElementById('studentEmail').value,
+        studentMainPhone: document.getElementById('studentMainPhone').value
+      };
+
+      const res = await fetch('/add_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      e.target.reset();
+    });
+
+    async function loadUsers() {
+      const res = await fetch('/get_users');
+      const users = await res.json();
+
+      const tbody = document.querySelector('#usersTable tbody');
+      tbody.innerHTML = "";
+
+      users.forEach(u => {
+        const row = `
+          <tr>
+            <td>${u.studentNum}</td>
+            <td>${u.fName}</td>
+            <td>${u.lName}</td>
+            <td>${u.studentEmail || ''}</td>
+            <td>${u.studentMainPhone || ''}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+  </script>
+
+</body>
+</html>
