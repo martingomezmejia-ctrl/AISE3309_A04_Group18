@@ -153,7 +153,23 @@
 
     <hr />
 
-    <button id="btnViewStudents">View All Students</button>
+    <!-- Controls for loading, searching, and paging -->
+    <button id="btnViewStudents">Load Students</button>
+
+    <div style="margin-top:10px; margin-bottom:10px;">
+      <label class="small" for="studentSearch">
+        Search (by #, first, last, or email):
+      </label>
+      <input id="studentSearch" type="text" style="width:260px;" />
+      <button id="btnSearchStudents">Search</button>
+      <button id="btnClearSearch">Clear</button>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <button id="btnPrevPage">&laquo; Prev</button>
+      <span id="pageInfo" class="small" style="margin:0 8px;"></span>
+      <button id="btnNextPage">Next &raquo;</button>
+    </div>
 
     <table>
       <thead>
@@ -234,6 +250,12 @@
     // Base URL (same origin as server)
     const BASE = '';
 
+    // Pagination + search state for students
+    let allStudents = [];
+    let filteredStudents = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
     // ---------- Helpers ----------
     function setStatus(id, message, isError = false) {
       const el = document.getElementById(id);
@@ -265,7 +287,7 @@
         if (!res.ok) throw new Error(data.error || 'Error adding student');
 
         setStatus('addStatus', data.message || 'Student added.');
-        // optionally refresh the student list
+        // refresh the list so we see the new student
         loadStudents();
       } catch (err) {
         console.error(err);
@@ -273,32 +295,129 @@
       }
     });
 
-    // ---------- Students: View ----------
+    // ---------- Students: Load from backend ----------
     async function loadStudents() {
       try {
         const res = await fetch(BASE + '/get_users');
         const data = await res.json();
-        const tbody = document.getElementById('studentsTableBody');
-        tbody.innerHTML = '';
 
-        data.forEach((s) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${s.studentNum}</td>
-            <td>${s.fName || ''}</td>
-            <td>${s.lName || ''}</td>
-            <td>${s.studentEmail || ''}</td>
-            <td>${s.studentMainPhone || ''}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+        allStudents = data;
+        filteredStudents = allStudents;
+        currentPage = 1;
+        renderStudentsTable();
       } catch (err) {
         console.error(err);
         alert('Error loading students: ' + err.message);
       }
     }
 
+    // ---------- Students: Render current page ----------
+    function renderStudentsTable() {
+      const tbody = document.getElementById('studentsTableBody');
+      tbody.innerHTML = '';
+
+      if (!filteredStudents || filteredStudents.length === 0) {
+        document.getElementById('pageInfo').textContent = 'No students to display.';
+        document.getElementById('btnPrevPage').disabled = true;
+        document.getElementById('btnNextPage').disabled = true;
+        return;
+      }
+
+      const total = filteredStudents.length;
+      const totalPages = Math.ceil(total / pageSize);
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, total);
+      const pageItems = filteredStudents.slice(startIndex, endIndex);
+
+      pageItems.forEach((s) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${s.studentNum}</td>
+          <td>${s.fName || ''}</td>
+          <td>${s.lName || ''}</td>
+          <td>${s.studentEmail || ''}</td>
+          <td>${s.studentMainPhone || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('pageInfo').textContent =
+        `Showing ${startIndex + 1}-${endIndex} of ${total} student(s). ` +
+        `(Page ${currentPage} of ${totalPages})`;
+
+      document.getElementById('btnPrevPage').disabled = currentPage === 1;
+      document.getElementById('btnNextPage').disabled = currentPage === totalPages;
+    }
+
     document.getElementById('btnViewStudents').addEventListener('click', loadStudents);
+
+    // ---------- Students: Search ----------
+    function applyStudentSearch() {
+      const q = document.getElementById('studentSearch').value.trim().toLowerCase();
+
+      if (!q) {
+        filteredStudents = allStudents;
+      } else {
+        filteredStudents = allStudents.filter((s) => {
+          const num = String(s.studentNum || '');
+          const fn = (s.fName || '').toLowerCase();
+          const ln = (s.lName || '').toLowerCase();
+          const em = (s.studentEmail || '').toLowerCase();
+          return (
+            num.includes(q) ||
+            fn.includes(q) ||
+            ln.includes(q) ||
+            em.includes(q)
+          );
+        });
+      }
+
+      currentPage = 1;
+      renderStudentsTable();
+    }
+
+    document
+      .getElementById('btnSearchStudents')
+      .addEventListener('click', applyStudentSearch);
+
+    document
+      .getElementById('btnClearSearch')
+      .addEventListener('click', () => {
+        document.getElementById('studentSearch').value = '';
+        filteredStudents = allStudents;
+        currentPage = 1;
+        renderStudentsTable();
+      });
+
+    document
+      .getElementById('studentSearch')
+      .addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          applyStudentSearch();
+        }
+      });
+
+    // ---------- Students: Pagination buttons ----------
+    document
+      .getElementById('btnPrevPage')
+      .addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderStudentsTable();
+        }
+      });
+
+    document
+      .getElementById('btnNextPage')
+      .addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredStudents.length / pageSize);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderStudentsTable();
+        }
+      });
 
     // ---------- Students: Update ----------
     document
@@ -428,7 +547,7 @@
         }
       });
 
-    // optional: load students on initial page load
+    // Load initial student page on first load
     loadStudents();
   </script>
 </body>
