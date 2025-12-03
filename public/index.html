@@ -246,6 +246,48 @@
     </table>
   </div>
 
+  <!-- =======================
+     SECTION – FACULTY CRUD
+     ======================= -->
+<div class="section">
+  <h2>Faculty</h2>
+
+  <!-- Add Faculty Form -->
+  <div class="card">
+    <h3>Add Faculty</h3>
+    <label>Name</label>
+    <input type="text" id="facultyName" />
+
+    <label>Office</label>
+    <input type="text" id="facultyOffice" />
+
+    <label>Phone</label>
+    <input type="text" id="facultyMainPhone" />
+
+    <label>Email</label>
+    <input type="text" id="facultyEmail" />
+
+    <button id="btnAddFaculty">Add Faculty</button>
+    <div id="facultyAddStatus" class="status"></div>
+  </div>
+
+  <hr />
+
+  <button id="btnViewFaculty">View Faculty</button>
+
+  <table id="facultyTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Office</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody id="facultyTableBody"></tbody>
+  </table>
+</div>
+
   <script>
     // Base URL (same origin as server)
     const BASE = '';
@@ -549,6 +591,56 @@
 
     // Load initial student page on first load
     loadStudents();
+
+        // ---------- Faculty: Add ----------
+    document.getElementById("btnAddFaculty").addEventListener("click", async () => {
+      const facultyName = document.getElementById("facultyName").value.trim();
+      const facultyOffice = document.getElementById("facultyOffice").value.trim();
+      const facultyMainPhone = document.getElementById("facultyMainPhone").value.trim();
+      const facultyEmail = document.getElementById("facultyEmail").value.trim();
+
+
+      if (!facultyName) {
+        setStatus("facultyAddStatus", "Faculty name is required.", true);
+        return;
+      }
+
+      try {
+        const res = await fetch("/add_faculty", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ facultyName, facultyOffice, facultyMainPhone, facultyEmail })
+        });
+
+        const data = await res.text();
+        setStatus("facultyAddStatus", data);
+      } catch (err) {
+        setStatus("facultyAddStatus", err.message, true);
+      }
+    });
+
+    // ---------- Faculty: View ----------
+    document.getElementById("btnViewFaculty").addEventListener("click", async () => {
+      try {
+        const res = await fetch("/get_faculty");
+        const rows = await res.json();
+        const tbody = document.getElementById("facultyTableBody");
+        tbody.innerHTML = "";
+
+        rows.forEach(f => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${f.facultyName}</td>
+            <td>${f.facultyOffice || ""}</td>
+            <td>${f.facultyMainPhone || ""}</td>
+            <td>${f.facultyEmail || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert("Error loading faculty: " + err.message);
+      }
+    });
   </script>
 </body>
 </html>

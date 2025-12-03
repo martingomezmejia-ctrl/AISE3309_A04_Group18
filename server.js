@@ -195,6 +195,43 @@ app.get('/reports/course-enrollment', async (req, res) => {
   }
 });
 
+// ------------------------------------------------------
+// 6) Add Faculty (JOIN + GROUP BY)
+// ------------------------------------------------------
+
+// ADD FACULTY
+app.post("/add_faculty", async (req, res) => {
+  try {
+    const { facultyName, facultyOffice, facultyMainPhone, facultyEmail } = req.body;
+
+    const sql = `
+      INSERT INTO Faculty (facultyName, facultyOffice, facultyPhone, facultyEmail)
+      VALUES (?, ?, ?)
+    `;
+
+    const [result] = await pool.query(sql, [
+      facultyName,
+      facultyOffice,
+      facultyMainPhone,
+      facultyEmail
+    ]);
+
+    res.send("Faculty added!");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// GET ALL FACULTY
+app.get("/get_faculty", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM Faculty");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 // -------------------------------
 // START SERVER
 // -------------------------------
