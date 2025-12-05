@@ -4,289 +4,606 @@
   <meta charset="UTF-8" />
   <title>UniversityDB – Student & Course Demo</title>
   <style>
+    :root {
+      /* Western-ish palette */
+      --bg-main: #111118;
+      --bg-alt: #171822;
+      --surface: #1f2230;
+      --surface-soft: #1a1c29;
+      --surface-elevated: #252838;
+      --accent: #4f2683;        /* Western purple */
+      --accent-alt: #6b3bb0;
+      --accent-soft: #2f2349;
+      --border-soft: #303347;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --table-header: #25263a;
+      --table-row-alt: #1b1c28;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-
-    h1, h2, h3 {
-      margin-top: 30px;
-    }
-
-    label {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.9rem;
-    }
-
-    input {
-      padding: 4px 6px;
-      margin-bottom: 4px;
-      width: 220px;
-    }
-
-    button {
-      margin-top: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    hr {
-      margin: 25px 0;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 6px 8px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-    }
-
-    .section {
-      margin-bottom: 30px;
-    }
-
-    .row {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, #23213a 0, transparent 55%),
+        radial-gradient(circle at 100% 100%, #1c2240 0, transparent 55%),
+        var(--bg-main);
+      color: var(--text-main);
       display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
+      justify-content: center;
+      padding: 24px;
     }
 
-    .card {
-      border: 1px solid #ddd;
-      padding: 12px 16px;
-      border-radius: 4px;
-      max-width: 320px;
+    .app-shell {
+      width: 100%;
+      max-width: 1200px;
+      background: radial-gradient(circle at top, #262038 0, #151622 55%);
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+      padding: 22px 26px 30px;
+    }
+
+    header {
+      border-bottom: 2px solid var(--accent-soft);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 span.brand {
+      font-weight: 700;
+      color: var(--accent-alt);
+    }
+
+    header h1 span.badge {
+      background: linear-gradient(to right, var(--accent), var(--accent-alt));
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #f9fafb;
+    }
+
+    header .subtitle {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    header .badge-stack {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    header .badge-stack span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-soft);
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    header .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    h2::before {
+      content: "";
+      width: 6px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--accent-alt), var(--accent));
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
     }
 
     .small {
       font-size: 0.85rem;
-      color: #555;
+      color: var(--text-muted);
+    }
+
+    .section {
+      margin-bottom: 28px;
+      padding: 18px 18px 20px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--surface-soft), var(--surface));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .card {
+      flex: 1 1 260px;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: var(--surface-elevated);
+      padding: 14px 16px 16px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-alt);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    label {
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 2px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 7px 9px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      font-size: 0.9rem;
+      background-color: #111827;
+      color: var(--text-main);
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent-alt);
+      box-shadow: 0 0 0 2px rgba(107, 59, 176, 0.4);
+      background-color: #020617;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: linear-gradient(to right, var(--accent), var(--accent-alt));
+      color: #f9fafb;
+      box-shadow: 0 10px 24px rgba(79, 38, 131, 0.55);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, filter 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 30px rgba(79, 38, 131, 0.7);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(79, 38, 131, 0.6);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent-alt);
+      border: 1px solid rgba(129, 140, 248, 0.6);
+      box-shadow: none;
+    }
+
+    .btn-ghost:hover {
+      background: var(--accent-soft);
+      box-shadow: none;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid rgba(55, 65, 81, 0.8);
+      margin: 18px 0;
+    }
+
+    .toolbar-inline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0 10px;
+    }
+
+    .toolbar-inline input {
+      width: 260px;
+    }
+
+    .pill-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 3px 9px;
+      background: rgba(55, 65, 81, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .pagination {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      margin-top: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface-elevated);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #374151;
+    }
+
+    th {
+      background: linear-gradient(to bottom, #2d2e43, var(--table-header));
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--table-row-alt);
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #151624;
+    }
+
+    tbody tr:hover {
+      background-color: #312e81;
     }
 
     .status {
       margin-top: 6px;
-      font-size: 0.9rem;
-      color: #007700;
+      font-size: 0.78rem;
+      color: var(--success);
     }
 
     .status.error {
-      color: #bb0000;
+      color: var(--danger);
+    }
+
+    code {
+      font-size: 0.86rem;
+      padding: 1px 5px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+    }
+
+    @media (max-width: 768px) {
+      .app-shell {
+        padding: 18px 16px 24px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      header .badge-stack {
+        text-align: left;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>University Database Demo</h1>
-  <p class="small">
-    Backend: Node + Express + MySQL, connected to <strong>universitydb</strong>.
-  </p>
-
-  <!-- =======================
-       SECTION 1 – STUDENT CRUD
-       ======================= -->
-  <div class="section">
-    <h2>Students</h2>
-
-    <div class="row">
-      <!-- Add student -->
-      <div class="card">
-        <h3>Add New Student</h3>
-        <label for="studentNum">Student Number</label>
-        <input id="studentNum" type="number" />
-
-        <label for="fName">First Name</label>
-        <input id="fName" type="text" />
-
-        <label for="lName">Last Name</label>
-        <input id="lName" type="text" />
-
-        <label for="studentEmail">Email</label>
-        <input id="studentEmail" type="email" />
-
-        <label for="studentMainPhone">Phone</label>
-        <input id="studentMainPhone" type="text" />
-
-        <button id="btnAddStudent">Add Student</button>
-        <div id="addStatus" class="status"></div>
+  <div class="app-shell">
+    <header>
+      <div>
+        <h1>
+          <span class="brand">Western</span> Engineering
+          <span class="badge">UniversityDB Demo</span>
+        </h1>
+        <p class="subtitle">
+          Internal dashboard for managing students, professors, and courses.
+        </p>
       </div>
-
-      <!-- Update student -->
-      <div class="card">
-        <h3>Update Student Contact</h3>
-        <p class="small">Updates email + phone based on student number.</p>
-
-        <label for="updStudentNum">Student Number</label>
-        <input id="updStudentNum" type="number" />
-
-        <label for="updEmail">New Email</label>
-        <input id="updEmail" type="email" />
-
-        <label for="updPhone">New Phone</label>
-        <input id="updPhone" type="text" />
-
-        <button id="btnUpdateStudent">Update Student</button>
-        <div id="updateStatus" class="status"></div>
+      <div class="badge-stack">
+        <span><span class="badge-dot"></span> Connected to <strong>universitydb</strong></span>
       </div>
+    </header>
 
-      <!-- Delete student -->
-      <div class="card">
-        <h3>Delete Student</h3>
-        <p class="small">Deletes the student row (careful!).</p>
-
-        <label for="delStudentNum">Student Number</label>
-        <input id="delStudentNum" type="number" />
-
-        <button id="btnDeleteStudent">Delete Student</button>
-        <div id="deleteStatus" class="status"></div>
-      </div>
-    </div>
-
-    <hr />
-
-    <!-- Controls for loading, searching, and paging -->
-    <button id="btnViewStudents">Load Students</button>
-
-    <div style="margin-top:10px; margin-bottom:10px;">
-      <label class="small" for="studentSearch">
-        Search (by #, first, last, or email):
-      </label>
-      <input id="studentSearch" type="text" style="width:260px;" />
-      <button id="btnSearchStudents">Search</button>
-      <button id="btnClearSearch">Clear</button>
-    </div>
-
-    <div style="margin-bottom:10px;">
-      <button id="btnPrevPage">&laquo; Prev</button>
-      <span id="pageInfo" class="small" style="margin:0 8px;"></span>
-      <button id="btnNextPage">Next &raquo;</button>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Student #</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Email</th>
-          <th>Phone</th>
-        </tr>
-      </thead>
-      <tbody id="studentsTableBody">
-        <!-- filled by JS -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- =======================
-       SECTION 2 – PROFESSOR COURSES
-       ======================= -->
-  <div class="section">
-    <h2>Professor Courses (JOIN)</h2>
-    <div class="card">
+    <!-- =======================
+         SECTION 1 – STUDENTS
+         ======================= -->
+    <div class="section">
+      <h2>Students</h2>
       <p class="small">
-        Shows all courses taught by a given professor using
-        <code>teaches</code> + <code>course</code>.
+        Create, update, delete, and browse student records. Use the search and pagination tools to explore the list.
       </p>
-      <label for="professorIDInput">Professor ID</label>
-      <input id="professorIDInput" type="number" />
-      <button id="btnProfessorCourses">View Professor Courses</button>
-      <div id="profCourseStatus" class="status"></div>
+
+      <div class="row">
+        <!-- Add student -->
+        <div class="card">
+          <h3>Add New Student</h3>
+          <p class="small">Add a new student to the database with basic contact details.</p>
+
+          <label for="studentNum">Student Number</label>
+          <input id="studentNum" type="number" />
+
+          <label for="fName">First Name</label>
+          <input id="fName" type="text" />
+
+          <label for="lName">Last Name</label>
+          <input id="lName" type="text" />
+
+          <label for="studentEmail">Email</label>
+          <input id="studentEmail" type="email" />
+
+          <label for="studentMainPhone">Phone</label>
+          <input id="studentMainPhone" type="text" />
+
+          <button id="btnAddStudent">Add Student</button>
+          <div id="addStatus" class="status"></div>
+        </div>
+
+        <!-- Update student -->
+        <div class="card">
+          <h3>Update Student Contact</h3>
+          <p class="small">Update email and phone based on the student's number.</p>
+
+          <label for="updStudentNum">Student Number</label>
+          <input id="updStudentNum" type="number" />
+
+          <label for="updEmail">New Email</label>
+          <input id="updEmail" type="email" />
+
+          <label for="updPhone">New Phone</label>
+          <input id="updPhone" type="text" />
+
+          <button id="btnUpdateStudent">Update Student</button>
+          <div id="updateStatus" class="status"></div>
+        </div>
+
+        <!-- Delete student -->
+        <div class="card">
+          <h3>Delete Student</h3>
+          <p class="small">Remove a student record completely. This action cannot be undone.</p>
+
+          <label for="delStudentNum">Student Number</label>
+          <input id="delStudentNum" type="number" />
+
+          <button id="btnDeleteStudent">Delete Student</button>
+          <div id="deleteStatus" class="status"></div>
+        </div>
+      </div>
+
+      <hr />
+
+      <!-- Controls for loading, searching, and paging -->
+      <div class="toolbar-inline">
+        <button id="btnViewStudents">Load Students</button>
+        <span class="pill-label">Table controls</span>
+      </div>
+
+      <div class="toolbar-inline">
+        <label class="small" for="studentSearch" style="margin: 0;">
+          Search (by #, first, last, or email):
+        </label>
+      </div>
+
+      <div class="toolbar-inline">
+        <input id="studentSearch" type="text" />
+        <button id="btnSearchStudents">Search</button>
+        <button id="btnClearSearch" class="btn-ghost">Clear</button>
+      </div>
+
+      <div class="pagination">
+        <button id="btnPrevPage" class="btn-ghost">&laquo; Prev</button>
+        <span id="pageInfo"></span>
+        <button id="btnNextPage" class="btn-ghost">Next &raquo;</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Student #</th>
+            <th>First</th>
+            <th>Last</th>
+            <th>Email</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTableBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Course ID</th>
-          <th>Course Name</th>
-          <th>TA Name</th>
-          <th>Dept Email</th>
-        </tr>
-      </thead>
-      <tbody id="professorCoursesBody">
-        <!-- filled by JS -->
-      </tbody>
-    </table>
-  </div>
+    <!-- =======================
+         SECTION 2 – PROFESSOR COURSES
+         ======================= -->
+    <div class="section">
+      <h2>Professor Courses (JOIN)</h2>
+      <div class="row">
+        <div class="card">
+          <p class="small">
+            Look up all courses taught by a professor using the
+            <code>teaches</code> and <code>course</code> tables.
+          </p>
+          <label for="professorIDInput">Professor ID</label>
+          <input id="professorIDInput" type="number" />
+          <button id="btnProfessorCourses">View Professor Courses</button>
+          <div id="profCourseStatus" class="status"></div>
+        </div>
+      </div>
 
-  <!-- =======================
-       SECTION 3 – COURSE ENROLLMENT REPORT
-       ======================= -->
-  <div class="section">
-    <h2>Course Enrollment Report (JOIN + GROUP BY)</h2>
-    <div class="card">
-      <p class="small">
-        Uses a JOIN between <code>course</code> and <code>attends</code> plus
-        <code>GROUP BY</code> to count students per course.
-      </p>
-      <button id="btnCourseEnrollment">Generate Report</button>
-      <div id="enrollmentStatus" class="status"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Course ID</th>
+            <th>Course Name</th>
+            <th>TA Name</th>
+            <th>Dept Email</th>
+          </tr>
+        </thead>
+        <tbody id="professorCoursesBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Course ID</th>
-          <th>Course Name</th>
-          <th># Students</th>
-        </tr>
-      </thead>
-      <tbody id="courseEnrollmentBody">
-        <!-- filled by JS -->
-      </tbody>
-    </table>
+    <!-- =======================
+         SECTION 3 – COURSE ENROLLMENT
+         ======================= -->
+    <div class="section">
+      <h2>Course Enrollment Report (JOIN + GROUP BY)</h2>
+      <div class="row">
+        <div class="card">
+          <p class="small">
+            Generates an aggregated view of how many students are enrolled in each course
+            using a JOIN between <code>course</code> and <code>attends</code> plus
+            <code>GROUP BY</code>.
+          </p>
+          <button id="btnCourseEnrollment">Generate Report</button>
+          <div id="enrollmentStatus" class="status"></div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Course ID</th>
+            <th>Course Name</th>
+            <th># Students</th>
+          </tr>
+        </thead>
+        <tbody id="courseEnrollmentBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- =======================
+         SECTION – FACULTY CRUD
+         ======================= -->
+    <div class="section">
+      <h2>Faculty</h2>
+
+      <div class="row">
+        <!-- Add Faculty Form -->
+        <div class="card">
+          <h3>Add Faculty</h3>
+          <p class="small">Add faculty members and their basic contact information.</p>
+
+          <label>Name</label>
+          <input type="text" id="facultyName" />
+
+          <label>Office</label>
+          <input type="text" id="facultyOffice" />
+
+          <label>Phone</label>
+          <input type="text" id="facultyMainPhone" />
+
+          <label>Email</label>
+          <input type="text" id="facultyEmail" />
+
+          <button id="btnAddFaculty">Add Faculty</button>
+          <div id="facultyAddStatus" class="status"></div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="toolbar-inline">
+        <button id="btnViewFaculty">View Faculty</button>
+      </div>
+
+      <table id="facultyTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Office</th>
+            <th>Phone</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="facultyTableBody"></tbody>
+      </table>
+    </div>
   </div>
-
-  <!-- =======================
-     SECTION – FACULTY CRUD
-     ======================= -->
-<div class="section">
-  <h2>Faculty</h2>
-
-  <!-- Add Faculty Form -->
-  <div class="card">
-    <h3>Add Faculty</h3>
-    <label>Name</label>
-    <input type="text" id="facultyName" />
-
-    <label>Office</label>
-    <input type="text" id="facultyOffice" />
-
-    <label>Phone</label>
-    <input type="text" id="facultyMainPhone" />
-
-    <label>Email</label>
-    <input type="text" id="facultyEmail" />
-
-    <button id="btnAddFaculty">Add Faculty</button>
-    <div id="facultyAddStatus" class="status"></div>
-  </div>
-
-  <hr />
-
-  <button id="btnViewFaculty">View Faculty</button>
-
-  <table id="facultyTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Office</th>
-        <th>Phone</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody id="facultyTableBody"></tbody>
-  </table>
-</div>
 
   <script>
     // Base URL (same origin as server)
@@ -592,13 +909,12 @@
     // Load initial student page on first load
     loadStudents();
 
-        // ---------- Faculty: Add ----------
+    // ---------- Faculty: Add ----------
     document.getElementById("btnAddFaculty").addEventListener("click", async () => {
       const facultyName = document.getElementById("facultyName").value.trim();
       const facultyOffice = document.getElementById("facultyOffice").value.trim();
       const facultyMainPhone = document.getElementById("facultyMainPhone").value.trim();
       const facultyEmail = document.getElementById("facultyEmail").value.trim();
-
 
       if (!facultyName) {
         setStatus("facultyAddStatus", "Faculty name is required.", true);
